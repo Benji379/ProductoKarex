@@ -1,6 +1,6 @@
 package Ventanas;
 
-import ConexionBd.ConexionSQL;
+import DAO.ConexionSQL;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
 import java.awt.HeadlessException;
@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Benji
  */
+
 public class JpanelClientes extends javax.swing.JPanel {
 
     ConexionSQL con1 = new ConexionSQL();

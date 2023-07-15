@@ -1,6 +1,6 @@
-package Formato;
+package DAO;
 
-import ConexionBd.ConexionSQL;
+import DAO.ConexionSQL;
 import javax.swing.JComboBox;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,14 +1,11 @@
-package ConexionBd;
+package DAO;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Flypaim Machine
- */
 public class ConexionSQL {
 
     Connection conectar = null;
@@ -16,10 +13,10 @@ public class ConexionSQL {
     public Connection conexion() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ConexionSQL.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         try {
             conectar = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/producto_kardex", "root", "");
         } catch (SQLException ex) {
@@ -27,5 +24,4 @@ public class ConexionSQL {
         }
         return conectar;
     }
-
 }

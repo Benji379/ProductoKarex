@@ -1,9 +1,9 @@
 package Ventanas;
 
-import ConexionBd.ConexionSQL;
+import DAO.ConexionSQL;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
-import Formato.RellenarSQL;
+import DAO.RellenarSQL;
 import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.ResultSet;

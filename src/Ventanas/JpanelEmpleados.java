@@ -1,6 +1,6 @@
 package Ventanas;
 
-import ConexionBd.ConexionSQL;
+import DAO.ConexionSQL;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
 import java.awt.HeadlessException;
@@ -39,14 +39,16 @@ public class JpanelEmpleados extends javax.swing.JPanel {
             conet = con1.conexion();
             st = conet.createStatement();
             rs = st.executeQuery(sql);
-            Object[] cliente = new Object[5];
+            Object[] cliente = new Object[7];
             modelo = (DefaultTableModel) JTEMPLEADOS.getModel();
             while (rs.next()) {
                 cliente[0] = rs.getInt("CodigoEmpleado");
-                cliente[1] = rs.getString("NomEmpleado");
-                cliente[2] = rs.getString("TipoContrato");
-                cliente[3] = rs.getString("TiempoContrato");
-                cliente[4] = rs.getString("Salario");
+                cliente[1] = rs.getString("DniEmpleado");
+                cliente[2] = rs.getString("NomEmpleado");
+                cliente[3] = rs.getString("TipoContrato");
+                cliente[4] = rs.getString("TiempoContrato");
+                cliente[5] = rs.getString("Salario");
+                cliente[6] = rs.getString("password");
                 modelo.addRow(cliente);
             }
             JTEMPLEADOS.setModel(modelo);
@@ -61,6 +63,8 @@ public class JpanelEmpleados extends javax.swing.JPanel {
         Proceso.Transparentar(txtTipoContrato);
         Proceso.Transparentar(txtTiempoContrato);
         Proceso.Transparentar(txtSalario);
+        Proceso.Transparentar(txtDniEmpleado);
+        Proceso.Transparentar(txtContraseña);
     }
 
     @SuppressWarnings("unchecked")
@@ -69,6 +73,12 @@ public class JpanelEmpleados extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         JTEMPLEADOS = new javax.swing.JTable();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        txtContraseña = new javax.swing.JTextField();
+        jSeparator7 = new javax.swing.JSeparator();
+        txtDniEmpleado = new javax.swing.JTextField();
+        jSeparator6 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         txtCodigoEmpleado = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -99,11 +109,11 @@ public class JpanelEmpleados extends javax.swing.JPanel {
 
             },
             new String [] {
-                "CodigoEmpleado", "NomEmpleado", "T.Contrato", "TiempoContrato", "Salario"
+                "CodigoEmpleado", "DniEmpleado", "NomEmpleado", "T.Contrato", "TiempoContrato", "Salario", "Contraseña"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -120,80 +130,116 @@ public class JpanelEmpleados extends javax.swing.JPanel {
         jScrollPane1.setViewportView(JTEMPLEADOS);
         if (JTEMPLEADOS.getColumnModel().getColumnCount() > 0) {
             JTEMPLEADOS.getColumnModel().getColumn(0).setPreferredWidth(50);
-            JTEMPLEADOS.getColumnModel().getColumn(1).setPreferredWidth(100);
+            JTEMPLEADOS.getColumnModel().getColumn(1).setPreferredWidth(90);
             JTEMPLEADOS.getColumnModel().getColumn(2).setPreferredWidth(100);
-            JTEMPLEADOS.getColumnModel().getColumn(3).setPreferredWidth(110);
-            JTEMPLEADOS.getColumnModel().getColumn(4).setPreferredWidth(100);
+            JTEMPLEADOS.getColumnModel().getColumn(3).setPreferredWidth(100);
+            JTEMPLEADOS.getColumnModel().getColumn(4).setPreferredWidth(110);
+            JTEMPLEADOS.getColumnModel().getColumn(5).setPreferredWidth(100);
+            JTEMPLEADOS.getColumnModel().getColumn(6).setPreferredWidth(100);
         }
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 190, 640, 360));
+
+        jLabel7.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel7.setText("DNI:");
+        add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 120, 20));
+
+        jLabel8.setFont(new java.awt.Font("DialogInput", 1, 16)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel8.setText("Contraseña:");
+        add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, 120, 20));
+
+        txtContraseña.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        txtContraseña.setForeground(new java.awt.Color(255, 255, 255));
+        txtContraseña.setBorder(null);
+        txtContraseña.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtContraseñaActionPerformed(evt);
+            }
+        });
+        add(txtContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 510, 130, 30));
+        add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 540, 130, 10));
+
+        txtDniEmpleado.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        txtDniEmpleado.setForeground(new java.awt.Color(255, 255, 255));
+        txtDniEmpleado.setBorder(null);
+        txtDniEmpleado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDniEmpleadoActionPerformed(evt);
+            }
+        });
+        add(txtDniEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 210, 130, 30));
+        add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 130, 10));
 
         jLabel1.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel1.setText("CODIGO:");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 240, 120, 20));
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, 120, 20));
 
         txtCodigoEmpleado.setEditable(false);
         txtCodigoEmpleado.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
         txtCodigoEmpleado.setForeground(new java.awt.Color(255, 255, 255));
         txtCodigoEmpleado.setBorder(null);
-        add(txtCodigoEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 230, 130, 30));
+        add(txtCodigoEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 150, 130, 30));
 
         jLabel2.setFont(new java.awt.Font("Century Gothic", 1, 36)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Datos");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 130, 50));
-        add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 260, 130, 10));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 70, 130, 50));
+        add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 180, 130, 10));
 
         jLabel3.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel3.setText("EMPLEADO:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 120, 20));
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, 120, 20));
 
         txtNomEmpleado.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
         txtNomEmpleado.setForeground(new java.awt.Color(255, 255, 255));
         txtNomEmpleado.setBorder(null);
-        add(txtNomEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 130, 30));
-        add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 320, 130, 10));
+        add(txtNomEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 270, 130, 30));
+        add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 300, 130, 10));
 
         jLabel4.setFont(new java.awt.Font("DialogInput", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel4.setText("TIPO. CONTRATO:");
-        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 130, 20));
+        add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 340, 130, 20));
 
         txtTipoContrato.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
         txtTipoContrato.setForeground(new java.awt.Color(255, 255, 255));
         txtTipoContrato.setBorder(null);
-        add(txtTipoContrato, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 350, 130, 30));
-        add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 380, 130, 10));
+        add(txtTipoContrato, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 330, 130, 30));
+        add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 360, 130, 10));
 
         jLabel5.setFont(new java.awt.Font("DialogInput", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel5.setText("TIEMP.CONTRATO");
-        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 420, 120, 20));
+        add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, 120, 20));
 
         txtTiempoContrato.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
         txtTiempoContrato.setForeground(new java.awt.Color(255, 255, 255));
         txtTiempoContrato.setBorder(null);
-        add(txtTiempoContrato, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, 130, 30));
-        add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 440, 130, 10));
+        add(txtTiempoContrato, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 130, 30));
+        add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 420, 130, 10));
 
         jLabel6.setFont(new java.awt.Font("DialogInput", 1, 16)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel6.setText("SALARIO: S/");
-        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 480, 120, 20));
+        add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 460, 120, 20));
 
         txtSalario.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
         txtSalario.setForeground(new java.awt.Color(255, 255, 255));
         txtSalario.setBorder(null);
-        add(txtSalario, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 470, 130, 30));
-        add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 500, 130, 10));
+        add(txtSalario, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 450, 130, 30));
+        add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 480, 130, 10));
 
         btnModificar.setFont(new java.awt.Font("Agency FB", 1, 20)); // NOI18N
         btnModificar.setText("Modificar");
@@ -248,15 +294,17 @@ public class JpanelEmpleados extends javax.swing.JPanel {
 
     void Modificar() {
         String NomEmpleado = txtNomEmpleado.getText();
+        String dniEmpleado = txtDniEmpleado.getText();
+        String contraseña = txtContraseña.getText();
         String TipoContrato = txtTipoContrato.getText();
         String TiempoContrato = txtTiempoContrato.getText();
         String Salario = String.valueOf(Double.parseDouble(txtSalario.getText()));
-        
+
         try {
-            if (Proceso.detectarVacios(NomEmpleado, TipoContrato, TiempoContrato, Salario)) {
+            if (Proceso.detectarVacios(NomEmpleado, TipoContrato, TiempoContrato, Salario, dniEmpleado, contraseña)) {
                 JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                String sql = "Update empleado set CodigoEmpleado='" + idc + "', NomEmpleado='" + NomEmpleado + "', TipoContrato='" + TipoContrato + "', TiempoContrato='" + TiempoContrato + "', Salario='" + Salario + "' where CodigoEmpleado=" + idc;
+                String sql = "Update empleado set CodigoEmpleado='" + idc + "', DniEmpleado='" + dniEmpleado + "', NomEmpleado='" + NomEmpleado + "', TipoContrato='" + TipoContrato + "', TiempoContrato='" + TiempoContrato + "', Salario='" + Salario + "', password='" + contraseña + "' where CodigoEmpleado=" + idc;
                 conet = con1.conexion();
                 st = conet.createStatement();
                 st.executeUpdate(sql);
@@ -315,21 +363,32 @@ public class JpanelEmpleados extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Selecciona una fila");
         } else {
             idc = Integer.parseInt((String) JTEMPLEADOS.getValueAt(fila, 0).toString());
-            String NomEmpleado = (String) JTEMPLEADOS.getValueAt(fila, 1);
-            String TipoContrato = (String) JTEMPLEADOS.getValueAt(fila, 2);
-            String NumDireccion = (String) JTEMPLEADOS.getValueAt(fila, 3);
-            String Telefono = (String) JTEMPLEADOS.getValueAt(fila, 4);
-
+            String dniEmpleado = (String) JTEMPLEADOS.getValueAt(fila, 1);
+            String NomEmpleado = (String) JTEMPLEADOS.getValueAt(fila, 2);
+            String TipoContrato = (String) JTEMPLEADOS.getValueAt(fila, 3);
+            String NumDireccion = (String) JTEMPLEADOS.getValueAt(fila, 4);
+            String Telefono = (String) JTEMPLEADOS.getValueAt(fila, 5);
+            String contraseña = (String) JTEMPLEADOS.getValueAt(fila, 6);
             txtCodigoEmpleado.setText("" + idc);
+            txtDniEmpleado.setText(dniEmpleado);
             txtNomEmpleado.setText(NomEmpleado);
             txtTipoContrato.setText(TipoContrato);
             txtTiempoContrato.setText(NumDireccion);
             txtSalario.setText(Telefono);
+            txtContraseña.setText(contraseña);
         }
     }//GEN-LAST:event_JTEMPLEADOSMouseClicked
 
+    private void txtDniEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDniEmpleadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDniEmpleadoActionPerformed
+
+    private void txtContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContraseñaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtContraseñaActionPerformed
+
     private void Nuevo() {
-        Proceso.limpiarTxtFields(txtSalario, txtCodigoEmpleado, txtTiempoContrato, txtNomEmpleado, txtTipoContrato);
+        Proceso.limpiarTxtFields(txtSalario, txtCodigoEmpleado, txtTiempoContrato, txtNomEmpleado, txtTipoContrato,txtDniEmpleado,txtContraseña);
     }
 
     void Eliminar() {
@@ -353,16 +412,17 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     }
 
     void Agregar() {
-        String NomCliente = txtNomEmpleado.getText();
+        String NomEmpleado = txtNomEmpleado.getText();
         String TipoContrato = txtTipoContrato.getText();
         String TiempoContrato = txtTiempoContrato.getText();
         String Salario = txtSalario.getText();
-
+        String dniEmpleado = txtDniEmpleado.getText();
+        String contraseña = txtContraseña.getText();
         try {
-            if (Proceso.detectarVacios(NomCliente, TipoContrato, TiempoContrato, Salario)) {
+            if (Proceso.detectarVacios(NomEmpleado, TipoContrato, TiempoContrato, Salario, dniEmpleado, contraseña)) {
                 JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                String sql = "insert into empleado(NomEmpleado,TipoContrato,TiempoContrato,Salario) values ('" + NomCliente + "','" + TipoContrato + "','" + TiempoContrato + "','" + Salario + "')";
+                String sql = "insert into empleado(DniEmpleado,NomEmpleado,TipoContrato,TiempoContrato,Salario,password) values ('" + dniEmpleado + "','" + NomEmpleado + "','" + TipoContrato + "','" + TiempoContrato + "','" + Salario + "','" + contraseña + "')";
                 conet = con1.conexion();
                 st = conet.createStatement();
                 st.executeUpdate(sql);
@@ -386,6 +446,8 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
@@ -393,7 +455,11 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
     private javax.swing.JTextField txtCodigoEmpleado;
+    private javax.swing.JTextField txtContraseña;
+    private javax.swing.JTextField txtDniEmpleado;
     private javax.swing.JTextField txtNomEmpleado;
     private javax.swing.JTextField txtSalario;
     private javax.swing.JTextField txtTiempoContrato;
