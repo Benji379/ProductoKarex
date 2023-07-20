@@ -1,6 +1,9 @@
 package Formato;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import javax.swing.JTextField;
 
@@ -10,8 +13,31 @@ import javax.swing.JTextField;
  */
 public class Proceso {
 
-    public static void Transparentar(JTextField txtField) {
-        txtField.setBackground(new java.awt.Color(0, 0, 0, 1));
+    private final List<JTextField> listaDeJTextFields;
+
+    public Proceso(JTextField... txtFields) {
+        listaDeJTextFields = new ArrayList<>();
+        listaDeJTextFields.addAll(Arrays.asList(txtFields));
+    }
+
+    public void Transparentar() {
+        Proceso.Transparentar(listaDeJTextFields.toArray(new JTextField[0]));
+    }
+
+    public void limpiarTxtFields() {
+        limpiarTxtFields(listaDeJTextFields.toArray(new JTextField[0]));
+    }
+
+    public static void Transparentar(JTextField... txtField) {
+        for (JTextField txt : txtField) {
+            txt.setBackground(new java.awt.Color(0, 0, 0, 1));
+        }
+    }
+
+    public static void limpiarTxtFields(JTextField... txt) {
+        for (JTextField tx : txt) {
+            tx.setText("");
+        }
     }
 
     public static boolean detectarVacios(String... txt) {
@@ -23,12 +49,6 @@ public class Proceso {
             }
         }
         return detectado;
-    }
-
-    public static void limpiarTxtFields(JTextField... txt) {
-        for (JTextField tx : txt) {
-            tx.setText("");
-        }
     }
 
     public static String obtenerFechaHoraActual() {

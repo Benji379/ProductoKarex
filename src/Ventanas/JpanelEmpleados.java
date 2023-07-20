@@ -1,13 +1,14 @@
 package Ventanas;
 
 import DAO.ConexionSQL;
+import DAO.Crud;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
-import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -23,48 +24,53 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     Statement st;
     ResultSet rs;
     int idc;
+    private Proceso text;
+    private final Crud crud;
 
     public JpanelEmpleados() {
         initComponents();
-        Transparentar();
+        crud = new Crud();
         consultar();
+        diseñoTablas();
+        textFields();
+    }
+
+    private void textFields() {
+        text = new Proceso(txtCodigoEmpleado, txtContraseña, txtDniEmpleado, txtNomEmpleado, txtSalario, txtTiempoContrato, txtTipoContrato);
+        text.Transparentar();
+    }
+
+    private void diseñoTablas() {
         DiseñoTablas d = new DiseñoTablas();
         d.AspectoContenido(JTEMPLEADOS);
         d.AspectoEncabezados(JTEMPLEADOS);
     }
 
-    private void consultar() {
-        String sql = "select * from empleado";
-        try {
-            conet = con1.conexion();
-            st = conet.createStatement();
-            rs = st.executeQuery(sql);
-            Object[] cliente = new Object[7];
-            modelo = (DefaultTableModel) JTEMPLEADOS.getModel();
-            while (rs.next()) {
-                cliente[0] = rs.getInt("CodigoEmpleado");
-                cliente[1] = rs.getString("DniEmpleado");
-                cliente[2] = rs.getString("NomEmpleado");
-                cliente[3] = rs.getString("TipoContrato");
-                cliente[4] = rs.getString("TiempoContrato");
-                cliente[5] = rs.getString("Salario");
-                cliente[6] = rs.getString("password");
-                modelo.addRow(cliente);
-            }
-            JTEMPLEADOS.setModel(modelo);
-        } catch (SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+    private Map<String, Integer> asignarColumnasTabla() {
+        Map<String, Integer> columnas = new HashMap<>();
+        columnas.put("CodigoEmpleado", 0);
+        columnas.put("dniEmpleado", 1);
+        columnas.put("NomEmpleado", 2);
+        columnas.put("TipoContrato", 3);
+        columnas.put("TiempoContrato", 4);
+        columnas.put("Salario", 5);
+        columnas.put("password", 6);
+        return columnas;
     }
 
-    private void Transparentar() {
-        Proceso.Transparentar(txtCodigoEmpleado);
-        Proceso.Transparentar(txtNomEmpleado);
-        Proceso.Transparentar(txtTipoContrato);
-        Proceso.Transparentar(txtTiempoContrato);
-        Proceso.Transparentar(txtSalario);
-        Proceso.Transparentar(txtDniEmpleado);
-        Proceso.Transparentar(txtContraseña);
+    private Map<String, String> datosInsertar() {
+        Map<String, String> columnas = new HashMap<>();
+        columnas.put("dniEmpleado", txtDniEmpleado.getText());
+        columnas.put("NomEmpleado", txtNomEmpleado.getText());
+        columnas.put("TipoContrato", txtTipoContrato.getText());
+        columnas.put("TiempoContrato", txtTiempoContrato.getText());
+        columnas.put("Salario", txtSalario.getText());
+        columnas.put("password", txtContraseña.getText());
+        return columnas;
+    }
+
+    private void consultar() {
+        crud.consultarTabla("empleado", asignarColumnasTabla(), JTEMPLEADOS);
     }
 
     @SuppressWarnings("unchecked")
@@ -293,53 +299,23 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     void Modificar() {
-        String NomEmpleado = txtNomEmpleado.getText();
-        String dniEmpleado = txtDniEmpleado.getText();
-        String contraseña = txtContraseña.getText();
-        String TipoContrato = txtTipoContrato.getText();
-        String TiempoContrato = txtTiempoContrato.getText();
-        String Salario = String.valueOf(Double.parseDouble(txtSalario.getText()));
+        int fila = JTEMPLEADOS.getSelectedRow();
 
-        try {
-            if (Proceso.detectarVacios(NomEmpleado, TipoContrato, TiempoContrato, Salario, dniEmpleado, contraseña)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "Update empleado set CodigoEmpleado='" + idc + "', DniEmpleado='" + dniEmpleado + "', NomEmpleado='" + NomEmpleado + "', TipoContrato='" + TipoContrato + "', TiempoContrato='" + TiempoContrato + "', Salario='" + Salario + "', password='" + contraseña + "' where CodigoEmpleado=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Datos de Datos de Empleado Modificados");
-                limpiarTabla();
-                consultar();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-    }
-
-    void limpiarTabla() {
-        for (int i = 0; i < JTEMPLEADOS.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i--;
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.modificar("empleado", "CodigoEmpleado", Integer.parseInt((String) JTEMPLEADOS.getValueAt(fila, 0).toString()), datosInsertar());
         }
     }
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        try {
-            Modificar();
-            Nuevo();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Modificar();
+        consultar();
+        Nuevo();
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-
-        try {
-            Agregar();
-            consultar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Agregar();
+        consultar();
         Nuevo();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
@@ -348,12 +324,8 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        try {
-            Eliminar();
-            consultar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Eliminar();
+        consultar();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void JTEMPLEADOSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTEMPLEADOSMouseClicked
@@ -388,50 +360,21 @@ public class JpanelEmpleados extends javax.swing.JPanel {
     }//GEN-LAST:event_txtContraseñaActionPerformed
 
     private void Nuevo() {
-        Proceso.limpiarTxtFields(txtSalario, txtCodigoEmpleado, txtTiempoContrato, txtNomEmpleado, txtTipoContrato,txtDniEmpleado,txtContraseña);
+        text.limpiarTxtFields();
     }
 
     void Eliminar() {
         int fila = JTEMPLEADOS.getSelectedRow();
-        try {
-            if (fila < 0) {
-                JOptionPane.showMessageDialog(null, "Fila no seleccionada");
-                limpiarTabla();
-            } else {
-                String sql = "delete from empleado where CodigoEmpleado=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Empleado Eliminado");
-                limpiarTabla();
-            }
 
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.eliminar("empleado", "CodigoEmpleado", Integer.parseInt((String) JTEMPLEADOS.getValueAt(fila, 0).toString()));
         }
     }
 
     void Agregar() {
-        String NomEmpleado = txtNomEmpleado.getText();
-        String TipoContrato = txtTipoContrato.getText();
-        String TiempoContrato = txtTiempoContrato.getText();
-        String Salario = txtSalario.getText();
-        String dniEmpleado = txtDniEmpleado.getText();
-        String contraseña = txtContraseña.getText();
-        try {
-            if (Proceso.detectarVacios(NomEmpleado, TipoContrato, TiempoContrato, Salario, dniEmpleado, contraseña)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "insert into empleado(DniEmpleado,NomEmpleado,TipoContrato,TiempoContrato,Salario,password) values ('" + dniEmpleado + "','" + NomEmpleado + "','" + TipoContrato + "','" + TiempoContrato + "','" + Salario + "','" + contraseña + "')";
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Nuevo Empleado");
-                limpiarTabla();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+        crud.insertar("empleado", datosInsertar());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

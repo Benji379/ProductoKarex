@@ -1,6 +1,7 @@
 package Ventanas;
 
 import DAO.ConexionSQL;
+import DAO.Crud;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
 import DAO.RellenarSQL;
@@ -9,6 +10,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -24,44 +27,45 @@ public class JpanelVentas extends javax.swing.JPanel {
     Statement st;
     ResultSet rs;
     int idc;
+    private final Proceso text;
+    private final Crud crud;
 
     public JpanelVentas() {
         initComponents();
-        Transparentar();
+        text = new Proceso(txtCodigoVenta, txtFechaVenta, txtMonto);
+        text.Transparentar();
+        crud = new Crud();
+        RellenarSQL.llenarComboBox(txtDniCliente, "cliente", "DNI");
+        diseñoTabla();
+        txtFechaVenta.setText(Proceso.obtenerFechaHoraActual());
         consultar();
+    }
+
+    private void diseñoTabla() {
         DiseñoTablas d = new DiseñoTablas();
         d.AspectoContenido(JTVentas);
         d.AspectoEncabezados(JTVentas);
-        RellenarSQL.llenarComboBox(txtDniCliente, "cliente", "DNI");
-        txtFechaVenta.setText(Proceso.obtenerFechaHoraActual());
+    }
+
+    private Map<String, Integer> asignarColumnasTabla() {
+        Map<String, Integer> columnas = new HashMap<>();
+        columnas.put("CodigoVenta", 0);
+        columnas.put("Monto", 1);
+        columnas.put("FechaVenta", 2);
+        columnas.put("DniCliente", 3);
+        return columnas;
+    }
+
+    private Map<String, String> datosInsertar() {
+        Map<String, String> columnas = new HashMap<>();
+        columnas.put("Monto", txtMonto.getText());
+        columnas.put("FechaVenta", txtFechaVenta.getText());
+        columnas.put("DniCliente", (String) txtDniCliente.getSelectedItem());
+        return columnas;
     }
 
     private void consultar() {
-        String sql = "select * from venta";
-        try {
-            conet = con1.conexion();
-            st = conet.createStatement();
-            rs = st.executeQuery(sql);
-            Object[] cliente = new Object[4];
-            modelo = (DefaultTableModel) JTVentas.getModel();
-            modelo.setRowCount(0);
-            while (rs.next()) {
-                cliente[0] = rs.getInt("CodigoVenta");
-                cliente[1] = rs.getString("Monto");
-                cliente[2] = rs.getString("FechaVenta");
-                cliente[3] = rs.getString("DniCliente");
-                modelo.addRow(cliente);
-            }
-            JTVentas.setModel(modelo);
-        } catch (SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-    }
-
-    private void Transparentar() {
-        Proceso.Transparentar(txtCodigoEmpleado);
-        Proceso.Transparentar(txtMonto);
-        Proceso.Transparentar(txtFechaVenta);
+        crud.consultarTabla("venta", asignarColumnasTabla(), JTVentas);
     }
 
     @SuppressWarnings("unchecked")
@@ -71,7 +75,7 @@ public class JpanelVentas extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         JTVentas = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        txtCodigoEmpleado = new javax.swing.JTextField();
+        txtCodigoVenta = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel3 = new javax.swing.JLabel();
@@ -130,11 +134,11 @@ public class JpanelVentas extends javax.swing.JPanel {
         jLabel1.setText("CODIGO:");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 120, 20));
 
-        txtCodigoEmpleado.setEditable(false);
-        txtCodigoEmpleado.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
-        txtCodigoEmpleado.setForeground(new java.awt.Color(255, 255, 255));
-        txtCodigoEmpleado.setBorder(null);
-        add(txtCodigoEmpleado, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 240, 150, 30));
+        txtCodigoVenta.setEditable(false);
+        txtCodigoVenta.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        txtCodigoVenta.setForeground(new java.awt.Color(255, 255, 255));
+        txtCodigoVenta.setBorder(null);
+        add(txtCodigoVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 240, 150, 30));
 
         jLabel2.setFont(new java.awt.Font("Century Gothic", 1, 36)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -230,50 +234,23 @@ public class JpanelVentas extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     void Modificar() {
-        String Monto = txtMonto.getText();
-        String FechaVenta = txtFechaVenta.getText();
-        String DniCliente = (String) txtDniCliente.getSelectedItem();
-
-        try {
-            if (Proceso.detectarVacios(Monto, FechaVenta)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "Update venta set CodigoVenta='" + idc + "', Monto='" + Monto + "', FechaVenta='" + FechaVenta + "', DniCliente='" + DniCliente + "' where CodigoVenta=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Datos de Venta de Venta Modificados");
-                limpiarTabla();
-                consultar();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        int fila = JTVentas.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.modificar("venta", "codigoVenta", Integer.parseInt((String) JTVentas.getValueAt(fila, 0).toString()), datosInsertar());
         }
     }
 
-    void limpiarTabla() {
-        for (int i = 0; i < JTVentas.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i--;
-        }
-    }
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        try {
-            Modificar();
-            Nuevo();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Modificar();
+        consultar();
+        Nuevo();
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-
-        try {
-            Agregar();
-            consultar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Agregar();
+        consultar();
         Nuevo();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
@@ -282,12 +259,8 @@ public class JpanelVentas extends javax.swing.JPanel {
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        try {
-            Eliminar();
-            consultar();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "ERROR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Eliminar();
+        consultar();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void JTVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTVentasMouseClicked
@@ -301,7 +274,7 @@ public class JpanelVentas extends javax.swing.JPanel {
             String TipoContrato = (String) JTVentas.getValueAt(fila, 2);
             String NumDireccion = (String) JTVentas.getValueAt(fila, 3);
 
-            txtCodigoEmpleado.setText("" + idc);
+            txtCodigoVenta.setText("" + idc);
             txtMonto.setText(NomEmpleado);
             txtFechaVenta.setText(TipoContrato);
             txtDniCliente.setSelectedItem(NumDireccion);
@@ -309,48 +282,20 @@ public class JpanelVentas extends javax.swing.JPanel {
     }//GEN-LAST:event_JTVentasMouseClicked
 
     private void Nuevo() {
-        Proceso.limpiarTxtFields(txtMonto, txtFechaVenta);
+        text.limpiarTxtFields();
     }
 
     void Eliminar() {
         int fila = JTVentas.getSelectedRow();
-        try {
-            if (fila < 0) {
-                JOptionPane.showMessageDialog(null, "Fila no seleccionada");
-                limpiarTabla();
-            } else {
-                String sql = "delete from venta where CodigoVenta=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Venta Eliminada");
-                limpiarTabla();
-            }
-
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.eliminar("venta", "codigoVenta", Integer.parseInt((String) JTVentas.getValueAt(fila, 0).toString()));
         }
     }
 
     void Agregar() {
-        String Monto = String.valueOf(Double.parseDouble(txtMonto.getText()));
-        String FechaVenta = txtFechaVenta.getText();
-        String DniCliente = (String) txtDniCliente.getSelectedItem();
-
-        try {
-            if (Proceso.detectarVacios(Monto, FechaVenta, DniCliente)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "insert into venta(Monto,FechaVenta,DniCliente) values ('" + Monto + "','" + FechaVenta + "','" + DniCliente + "')";
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Nuevo Venta");
-                limpiarTabla();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+        crud.insertar("venta", datosInsertar());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -369,7 +314,7 @@ public class JpanelVentas extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JTextField txtCodigoEmpleado;
+    private javax.swing.JTextField txtCodigoVenta;
     private javax.swing.JComboBox<String> txtDniCliente;
     private javax.swing.JTextField txtFechaVenta;
     private javax.swing.JTextField txtMonto;

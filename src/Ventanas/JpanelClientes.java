@@ -1,13 +1,14 @@
 package Ventanas;
 
 import DAO.ConexionSQL;
+import DAO.Crud;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
-import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -15,7 +16,6 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Benji
  */
-
 public class JpanelClientes extends javax.swing.JPanel {
 
     ConexionSQL con1 = new ConexionSQL();
@@ -23,46 +23,53 @@ public class JpanelClientes extends javax.swing.JPanel {
     DefaultTableModel modelo;
     Statement st;
     ResultSet rs;
-    int idc;
+    private int idc;
+    private Proceso text;
+    private final Crud crud;
 
     public JpanelClientes() {
         initComponents();
-        Transparentar();
+        crud = new Crud();
+        textFields();
         consultar();
+        diseñoTablas();
+    }
+
+    private void textFields() {
+        text = new Proceso(txtCodigoCliente, txtNomCliente, txtDni, txtDireccion, txtTelefono);
+        text.Transparentar();
+    }
+
+    private void diseñoTablas() {
         DiseñoTablas d = new DiseñoTablas();
         d.AspectoContenido(JTClientes);
         d.AspectoEncabezados(JTClientes);
     }
 
-    private void consultar() {
-        String sql = "select * from cliente";
-        try {
-            conet = con1.conexion();
-            st = conet.createStatement();
-            rs = st.executeQuery(sql);
-            Object[] cliente = new Object[5];
-            modelo = (DefaultTableModel) JTClientes.getModel();
-            modelo.setRowCount(0);
-            while (rs.next()) {
-                cliente[0] = rs.getInt("CodigoCliente");
-                cliente[1] = rs.getString("NomCliente");
-                cliente[2] = rs.getString("DNI");
-                cliente[3] = rs.getString("Direccion");
-                cliente[4] = rs.getString("Telefono");
-                modelo.addRow(cliente);
-            }
-            JTClientes.setModel(modelo);
-        } catch (SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+    private Map<String, Integer> asignarColumnasTabla() {
+        Map<String, Integer> columnas = new HashMap<>();
+
+        columnas.put("CodigoCliente", 0);
+        columnas.put("NomCliente", 1);
+        columnas.put("DNI", 2);
+        columnas.put("Direccion", 3);
+        columnas.put("Telefono", 4);
+
+        return columnas;
     }
 
-    private void Transparentar() {
-        Proceso.Transparentar(txtCodigoCliente);
-        Proceso.Transparentar(txtNomCliente);
-        Proceso.Transparentar(txtDni);
-        Proceso.Transparentar(txtDireccion);
-        Proceso.Transparentar(txtTelefono);
+    private Map<String, String> datosInsertar() {
+        Map<String, String> columnas = new HashMap<>();
+
+        columnas.put("NomCliente", txtNomCliente.getText());
+        columnas.put("DNI", txtDni.getText());
+        columnas.put("Direccion", txtDireccion.getText());
+        columnas.put("Telefono", txtTelefono.getText());
+        return columnas;
+    }
+
+    private void consultar() {
+        crud.consultarTabla("cliente", asignarColumnasTabla(), JTClientes);
     }
 
     @SuppressWarnings("unchecked")
@@ -248,50 +255,25 @@ public class JpanelClientes extends javax.swing.JPanel {
         add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 20, 420, 80));
     }// </editor-fold>//GEN-END:initComponents
 
-    void Modificar() {
+    private void Modificar() {
+        int fila = JTClientes.getSelectedRow();
 
-        String NomCliente = txtNomCliente.getText();
-        String DNI = txtDni.getText();
-        String NumDireccion = txtDireccion.getText();
-        String Telefono = txtTelefono.getText();
-
-        try {
-            if (Proceso.detectarVacios(NomCliente, DNI, NumDireccion, Telefono)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "Update cliente set CodigoCliente='" + idc + "', NomCliente='" + NomCliente + "', DNI='" + DNI + "', Direccion='" + NumDireccion + "', Telefono='" + Telefono + "' where CodigoCliente=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Datos de Datos de Cliente Mpdificados");
-                limpiarTabla();
-                consultar();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-    }
-
-    void limpiarTabla() {
-        for (int i = 0; i < JTClientes.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i--;
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.modificar("cliente", "CodigoCliente", Integer.parseInt((String) JTClientes.getValueAt(fila, 0).toString()), datosInsertar());
         }
     }
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         Modificar();
+        consultar();
         Nuevo();
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-
-        try {
-            Agregar();
-            consultar();
-            Nuevo();
-        } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+        Agregar();
+        consultar();
+        Nuevo();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -312,64 +294,35 @@ public class JpanelClientes extends javax.swing.JPanel {
             idc = Integer.parseInt((String) JTClientes.getValueAt(fila, 0).toString());
             String NomCliente = (String) JTClientes.getValueAt(fila, 1);
             String DNI = (String) JTClientes.getValueAt(fila, 2);
-            String NumDireccion = (String) JTClientes.getValueAt(fila, 3);
+            String Direccion = (String) JTClientes.getValueAt(fila, 3);
             String Telefono = (String) JTClientes.getValueAt(fila, 4);
 
             txtCodigoCliente.setText("" + idc);
             txtNomCliente.setText(NomCliente);
             txtDni.setText(DNI);
-            txtDireccion.setText(NumDireccion);
+            txtDireccion.setText(Direccion);
             txtTelefono.setText(Telefono);
         }
     }//GEN-LAST:event_JTClientesMouseClicked
 
     private void Nuevo() {
-        Proceso.limpiarTxtFields(txtTelefono, txtCodigoCliente, txtDireccion, txtNomCliente, txtDni);
+        text.limpiarTxtFields();
     }
 
     void Eliminar() {
-
         int fila = JTClientes.getSelectedRow();
 
-        try {
-            if (fila < 0) {
-                JOptionPane.showMessageDialog(null, "Fila no seleccionada");
-                limpiarTabla();
-            } else {
-                String sql = "delete from cliente where CodigoCliente=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Cliente Eliminado");
-                limpiarTabla();
-            }
-
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.eliminar("cliente", "CodigoCliente", Integer.parseInt((String) JTClientes.getValueAt(fila, 0).toString()));
         }
     }
 
-    void Agregar() {
-        String NomCliente = txtNomCliente.getText();
-        String DNI = txtDni.getText();
-        String NumDireccion = txtDireccion.getText();
-        String Telefono = txtTelefono.getText();
-
-        try {
-            if (Proceso.detectarVacios(NomCliente, DNI, NumDireccion, Telefono)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "insert into cliente(NomCliente,DNI,Direccion,Telefono) values ('" + NomCliente + "','" + DNI + "','" + NumDireccion + "','" + Telefono + "')";
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Nuevo Cliente");
-                limpiarTabla();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+    private void Agregar() {
+        crud.insertar("cliente", datosInsertar());
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable JTClientes;

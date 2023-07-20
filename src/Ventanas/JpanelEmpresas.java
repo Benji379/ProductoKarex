@@ -1,14 +1,15 @@
 package Ventanas;
 
 import DAO.ConexionSQL;
+import DAO.Crud;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
 import DAO.RellenarSQL;
-import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -24,49 +25,50 @@ public class JpanelEmpresas extends javax.swing.JPanel {
     Statement st;
     ResultSet rs;
     int idc;
+    private final Proceso text;
+    private final Crud crud;
 
     public JpanelEmpresas() {
         initComponents();
-        Transparentar();
+        crud = new Crud();
+        text = new Proceso(txtCiudad, txtCodAlmacen, txtCodigoEmpresa, txtDireccion, txtNomEmpresa, txtRuc);
+        text.Transparentar();
+        RellenarSQL.llenarComboBox(txtEmpleado, "Empleado", "NomEmpleado");
+        diseñoTabla();
         consultar();
+    }
+
+    private void diseñoTabla() {
         DiseñoTablas d = new DiseñoTablas();
         d.AspectoContenido(JTEmpresas);
         d.AspectoEncabezados(JTEmpresas);
-        RellenarSQL.llenarComboBox(txtEmpleado, "Empleado", "NomEmpleado");
+    }
+
+    private Map<String, Integer> asignarColumnasTabla() {
+        Map<String, Integer> columnas = new HashMap<>();
+        columnas.put("CodigoEmpresa", 0);
+        columnas.put("NomEmpresa", 1);
+        columnas.put("Ruc", 2);
+        columnas.put("NumDireccion", 3);
+        columnas.put("Ciudad", 4);
+        columnas.put("CodigoEmpleado", 5);
+        columnas.put("CodigoAlmacen", 6);
+        return columnas;
+    }
+
+    private Map<String, String> datosInsertar() {
+        Map<String, String> columnas = new HashMap<>();
+        columnas.put("NomEmpresa", txtNomEmpresa.getText());
+        columnas.put("Ruc", txtRuc.getText());
+        columnas.put("NumDireccion", txtDireccion.getText());
+        columnas.put("Ciudad", txtCiudad.getText());
+        columnas.put("CodigoEmpleado", (String) txtEmpleado.getSelectedItem());
+        columnas.put("CodigoAlmacen", txtCodAlmacen.getText());
+        return columnas;
     }
 
     private void consultar() {
-        String sql = "select * from empresa";
-        try {
-            conet = con1.conexion();
-            st = conet.createStatement();
-            rs = st.executeQuery(sql);
-            Object[] cliente = new Object[7];
-            modelo = (DefaultTableModel) JTEmpresas.getModel();
-            modelo.setRowCount(0);
-            while (rs.next()) {
-                cliente[0] = rs.getInt("CodigoEmpresa");
-                cliente[1] = rs.getString("NomEmpresa");
-                cliente[2] = rs.getString("Ruc");
-                cliente[3] = rs.getString("NumDireccion");
-                cliente[4] = rs.getString("Ciudad");
-                cliente[5] = rs.getString("CodigoEmpleado");
-                cliente[6] = rs.getString("CodigoAlmacen");
-                modelo.addRow(cliente);
-            }
-            JTEmpresas.setModel(modelo);
-        } catch (SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-    }
-
-    private void Transparentar() {
-        Proceso.Transparentar(txtCodigoEmpresa);
-        Proceso.Transparentar(txtNomEmpresa);
-        Proceso.Transparentar(txtRuc);
-        Proceso.Transparentar(txtDireccion);
-        Proceso.Transparentar(txtCiudad);
-        Proceso.Transparentar(txtCodAlmacen);
+        crud.consultarTabla("empresa", asignarColumnasTabla(), JTEmpresas);
     }
 
     @SuppressWarnings("unchecked")
@@ -282,51 +284,24 @@ public class JpanelEmpresas extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     void Modificar() {
-
-        String NomEmpresa = txtNomEmpresa.getText();
-        String Ruc = txtRuc.getText();
-        String NumDireccion = txtDireccion.getText();
-        String Ciudad = txtCiudad.getText();
-        String CodigoEmpleado = (String) txtEmpleado.getSelectedItem();
-        String CodigoAlmacen = txtCodAlmacen.getText();
-
-        try {
-            if (Proceso.detectarVacios(NomEmpresa, Ruc, NumDireccion, Ciudad, CodigoEmpleado, CodigoAlmacen)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "Update empresa set CodigoEmpresa='" + idc + "', NomEmpresa='" + NomEmpresa + "', Ruc='" + Ruc + "', NumDireccion='" + NumDireccion + "', Ciudad='" + Ciudad + "', CodigoEmpleado='" + CodigoEmpleado + "', CodigoAlmacen='" + CodigoAlmacen + "' where CodigoEmpresa=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Datos de Datos de Empresa Mpdificados");
-                limpiarTabla();
-                consultar();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        int fila = JTEmpresas.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.modificar("empresa", "CodigoEmpresa", Integer.parseInt((String) JTEmpresas.getValueAt(fila, 0).toString()), datosInsertar());
         }
     }
 
-    void limpiarTabla() {
-        for (int i = 0; i < JTEmpresas.getRowCount(); i++) {
-            modelo.removeRow(i);
-            i--;
-        }
-    }
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         Modificar();
+        consultar();
         Nuevo();
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-
-        try {
-            Agregar();
-            consultar();
-            Nuevo();
-        } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+        Agregar();
+        consultar();
+        Nuevo();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -363,52 +338,20 @@ public class JpanelEmpresas extends javax.swing.JPanel {
     }//GEN-LAST:event_JTEmpresasMouseClicked
 
     private void Nuevo() {
-        Proceso.limpiarTxtFields(txtCiudad, txtCodAlmacen, txtCodigoEmpresa, txtDireccion, txtNomEmpresa, txtRuc);
-        txtEmpleado.setSelectedIndex(0);
+        text.limpiarTxtFields();
     }
 
     void Eliminar() {
         int fila = JTEmpresas.getSelectedRow();
-        try {
-            if (fila < 0) {
-                JOptionPane.showMessageDialog(null, "Fila no seleccionada");
-                limpiarTabla();
-            } else {
-                String sql = "delete from empresa where CodigoEmpresa=" + idc;
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Empresa Eliminada");
-                limpiarTabla();
-            }
-
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Selecciona una fila");
+        } else {
+            crud.eliminar("empresa", "CodigoEmpresa", Integer.parseInt((String) JTEmpresas.getValueAt(fila, 0).toString()));
         }
     }
 
     void Agregar() {
-        String NomEmpresa = txtNomEmpresa.getText();
-        String Ruc = txtRuc.getText();
-        String NumDireccion = txtDireccion.getText();
-        String Ciudad = txtCiudad.getText();
-        String CodigoEmpleado = (String) txtEmpleado.getSelectedItem();
-        String CodigoAlmacen = txtCodAlmacen.getText();
-
-        try {
-            if (Proceso.detectarVacios(NomEmpresa, Ruc, NumDireccion, Ciudad, CodigoEmpleado, CodigoAlmacen)) {
-                JOptionPane.showMessageDialog(null, "ERROR: campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                String sql = "insert into empresa(NomEmpresa,Ruc,NumDireccion,Ciudad,CodigoEmpleado,CodigoAlmacen) values ('" + NomEmpresa + "','" + Ruc + "','" + NumDireccion + "','" + Ciudad + "','" + CodigoEmpleado + "','" + CodigoAlmacen + "')";
-                conet = con1.conexion();
-                st = conet.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Nueva Empresa");
-                limpiarTabla();
-            }
-        } catch (HeadlessException | SQLException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
+        crud.insertar("empresa", datosInsertar());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
