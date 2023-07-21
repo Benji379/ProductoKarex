@@ -1,6 +1,7 @@
 package Ventanas;
 
 import DAO.UsuarioDAO;
+import java.awt.Toolkit;
 
 /**
  *
@@ -13,6 +14,7 @@ public class frmLogin extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         Formato.Proceso.Transparentar(txtUsuario);
         Formato.Proceso.Transparentar(txtContraseña);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/iconoSodimac.png")));
     }
 
     @SuppressWarnings("unchecked")

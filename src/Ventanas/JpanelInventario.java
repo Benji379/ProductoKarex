@@ -4,9 +4,6 @@ import DAO.ConexionSQL;
 import DAO.Crud;
 import Formato.Proceso;
 import Formato.DiseñoTablas;
-import DAO.RellenarSQL;
-import DAO.StockUpdater;
-import Formato.temp;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -19,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Benji
  */
-public class JpanelVentas extends javax.swing.JPanel {
+public class JpanelInventario extends javax.swing.JPanel {
 
     ConexionSQL con1 = new ConexionSQL();
     Connection conet;
@@ -30,42 +27,40 @@ public class JpanelVentas extends javax.swing.JPanel {
     private final Proceso text;
     private final Crud crud;
 
-    public JpanelVentas() {
+    public JpanelInventario() {
         initComponents();
-        text = new Proceso(txtCodigoVenta, txtFechaVenta, txtMonto);
+        text = new Proceso(txtCodigoProducto, txtPrecio, txtNombreProducto, txtStock);
         text.Transparentar();
         crud = new Crud();
-        RellenarSQL.llenarComboBox(txtDniCliente, "cliente", "DNI");
         diseñoTabla();
-        txtFechaVenta.setText(Proceso.obtenerFechaHoraActual());
         consultar();
     }
 
     private void diseñoTabla() {
         DiseñoTablas d = new DiseñoTablas();
-        d.AspectoContenido(JTVentas);
-        d.AspectoEncabezados(JTVentas);
+        d.AspectoContenido(JTInventario);
+        d.AspectoEncabezados(JTInventario);
     }
 
     private Map<String, Integer> asignarColumnasTabla() {
         Map<String, Integer> columnas = new HashMap<>();
-        columnas.put("CodigoVenta", 0);
-        columnas.put("Monto", 1);
-        columnas.put("FechaVenta", 2);
-        columnas.put("DniCliente", 3);
+        columnas.put("CodigoProducto", 0);
+        columnas.put("nombre", 1);
+        columnas.put("Precio", 2);
+        columnas.put("stock", 3);
         return columnas;
     }
 
     private Map<String, String> datosInsertar() {
         Map<String, String> columnas = new HashMap<>();
-        columnas.put("Monto", txtMonto.getText());
-        columnas.put("FechaVenta", txtFechaVenta.getText());
-        columnas.put("DniCliente", (String) txtDniCliente.getSelectedItem());
+        columnas.put("nombre", txtNombreProducto.getText());
+        columnas.put("precio", txtPrecio.getText());
+        columnas.put("stock", txtStock.getText());
         return columnas;
     }
 
     private void consultar() {
-        crud.consultarTabla("venta", asignarColumnasTabla(), JTVentas);
+        crud.consultarTabla("inventario", asignarColumnasTabla(), JTInventario);
     }
 
     @SuppressWarnings("unchecked")
@@ -73,16 +68,18 @@ public class JpanelVentas extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        JTVentas = new javax.swing.JTable();
+        JTInventario = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        txtCodigoVenta = new javax.swing.JTextField();
+        txtCodigoProducto = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel3 = new javax.swing.JLabel();
-        txtMonto = new javax.swing.JTextField();
+        txtNombreProducto = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel4 = new javax.swing.JLabel();
-        txtFechaVenta = new javax.swing.JTextField();
+        txtStock = new javax.swing.JTextField();
+        jSeparator4 = new javax.swing.JSeparator();
+        txtPrecio = new javax.swing.JTextField();
         jSeparator3 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         btnModificar = new javax.swing.JButton();
@@ -90,18 +87,16 @@ public class JpanelVentas extends javax.swing.JPanel {
         btnNuevo = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
-        txtDniCliente = new javax.swing.JComboBox<>();
-        btnComprar = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(24, 24, 24));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        JTVentas.setModel(new javax.swing.table.DefaultTableModel(
+        JTInventario.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "CodigoVenta", "Monto", "Fecha Venta", "Codigo Cliente"
+                "CodigoVenta", "Nombre", "Precio", "Stock"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -112,19 +107,19 @@ public class JpanelVentas extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        JTVentas.setGridColor(new java.awt.Color(30, 30, 30));
-        JTVentas.setSelectionBackground(new java.awt.Color(30, 30, 30));
-        JTVentas.addMouseListener(new java.awt.event.MouseAdapter() {
+        JTInventario.setGridColor(new java.awt.Color(30, 30, 30));
+        JTInventario.setSelectionBackground(new java.awt.Color(30, 30, 30));
+        JTInventario.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                JTVentasMouseClicked(evt);
+                JTInventarioMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(JTVentas);
-        if (JTVentas.getColumnModel().getColumnCount() > 0) {
-            JTVentas.getColumnModel().getColumn(0).setPreferredWidth(50);
-            JTVentas.getColumnModel().getColumn(1).setPreferredWidth(100);
-            JTVentas.getColumnModel().getColumn(2).setPreferredWidth(100);
-            JTVentas.getColumnModel().getColumn(3).setPreferredWidth(110);
+        jScrollPane1.setViewportView(JTInventario);
+        if (JTInventario.getColumnModel().getColumnCount() > 0) {
+            JTInventario.getColumnModel().getColumn(0).setPreferredWidth(50);
+            JTInventario.getColumnModel().getColumn(1).setPreferredWidth(100);
+            JTInventario.getColumnModel().getColumn(2).setPreferredWidth(100);
+            JTInventario.getColumnModel().getColumn(3).setPreferredWidth(110);
         }
 
         add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 190, 640, 360));
@@ -135,11 +130,11 @@ public class JpanelVentas extends javax.swing.JPanel {
         jLabel1.setText("CODIGO:");
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 120, 20));
 
-        txtCodigoVenta.setEditable(false);
-        txtCodigoVenta.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
-        txtCodigoVenta.setForeground(new java.awt.Color(255, 255, 255));
-        txtCodigoVenta.setBorder(null);
-        add(txtCodigoVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 240, 150, 30));
+        txtCodigoProducto.setEditable(false);
+        txtCodigoProducto.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        txtCodigoProducto.setForeground(new java.awt.Color(255, 255, 255));
+        txtCodigoProducto.setBorder(null);
+        add(txtCodigoProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 240, 150, 30));
 
         jLabel2.setFont(new java.awt.Font("Century Gothic", 1, 36)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -151,37 +146,42 @@ public class JpanelVentas extends javax.swing.JPanel {
         jLabel3.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel3.setText("MONTO:");
+        jLabel3.setText("NOMBRE:");
         add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 310, 120, 20));
 
-        txtMonto.setEditable(false);
-        txtMonto.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
-        txtMonto.setForeground(new java.awt.Color(255, 255, 255));
-        txtMonto.setBorder(null);
-        add(txtMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 100, 30));
-        add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 330, 100, 10));
+        txtNombreProducto.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        txtNombreProducto.setForeground(new java.awt.Color(255, 255, 255));
+        txtNombreProducto.setBorder(null);
+        add(txtNombreProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 150, 30));
+        add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 330, 150, 10));
 
-        jLabel4.setFont(new java.awt.Font("DialogInput", 1, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel4.setText("FECHA VENTA:");
+        jLabel4.setText("PRECIO:");
         add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 370, 130, 20));
 
-        txtFechaVenta.setFont(new java.awt.Font("DialogInput", 0, 12)); // NOI18N
-        txtFechaVenta.setForeground(new java.awt.Color(255, 255, 255));
-        txtFechaVenta.setBorder(null);
-        txtFechaVenta.addActionListener(new java.awt.event.ActionListener() {
+        txtStock.setFont(new java.awt.Font("DialogInput", 0, 12)); // NOI18N
+        txtStock.setForeground(new java.awt.Color(255, 255, 255));
+        txtStock.setBorder(null);
+        add(txtStock, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 420, 150, 30));
+        add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 450, 150, 10));
+
+        txtPrecio.setFont(new java.awt.Font("DialogInput", 0, 12)); // NOI18N
+        txtPrecio.setForeground(new java.awt.Color(255, 255, 255));
+        txtPrecio.setBorder(null);
+        txtPrecio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFechaVentaActionPerformed(evt);
+                txtPrecioActionPerformed(evt);
             }
         });
-        add(txtFechaVenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 360, 150, 30));
+        add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 360, 150, 30));
         add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 390, 150, 10));
 
-        jLabel5.setFont(new java.awt.Font("DialogInput", 1, 14)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("DialogInput", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel5.setText("DNI CLIENTE:");
+        jLabel5.setText("STOCK:");
         add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 430, 120, 20));
 
         btnModificar.setFont(new java.awt.Font("Agency FB", 1, 20)); // NOI18N
@@ -231,29 +231,16 @@ public class JpanelVentas extends javax.swing.JPanel {
         jLabel9.setFont(new java.awt.Font("Century Gothic", 1, 48)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("VENTAS");
+        jLabel9.setText("INVENTARIO");
         add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 20, 420, 80));
-
-        txtDniCliente.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
-        txtDniCliente.setBorder(null);
-        add(txtDniCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 420, 150, 40));
-
-        btnComprar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnComprar.setFocusPainted(false);
-        btnComprar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnComprarActionPerformed(evt);
-            }
-        });
-        add(btnComprar, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 300, 40, 30));
     }// </editor-fold>//GEN-END:initComponents
 
     void Modificar() {
-        int fila = JTVentas.getSelectedRow();
+        int fila = JTInventario.getSelectedRow();
         if (fila == -1) {
             JOptionPane.showMessageDialog(null, "Selecciona una fila");
         } else {
-            crud.modificar("venta", "codigoVenta", Integer.parseInt((String) JTVentas.getValueAt(fila, 0).toString()), datosInsertar());
+            crud.modificar("inventario", "codigoProducto", Integer.parseInt((String) JTInventario.getValueAt(fila, 0).toString()), datosInsertar());
         }
     }
 
@@ -263,24 +250,9 @@ public class JpanelVentas extends javax.swing.JPanel {
         Nuevo();
     }//GEN-LAST:event_btnModificarActionPerformed
 
-    private void agregarVenta() {
-        String tableName = "inventario"; // Nombre de la tabla en la base de datos
-        String productNameColumn = "nombre"; // Nombre de la columna con el nombre del producto
-        String stockColumn = "stock"; // Nombre de la columna con el stock del producto
-
-        String filePath = "temp.txt"; // Ruta del archivo de texto con los datos de compra
-        int productNameColumnIndex = 0; // Número de columna donde están los nombres de los productos en el archivo
-        int quantityColumnIndex = 1; // Número de columna donde está la cantidad comprada en el archivo
-
-        StockUpdater.updateStockFromTextFile(tableName, productNameColumn, stockColumn,
-                filePath, productNameColumnIndex, quantityColumnIndex);
-        temp.vaciarArchivo("temp.txt");
-    }
-
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         Agregar();
         consultar();
-        agregarVenta();
         Nuevo();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
@@ -293,55 +265,48 @@ public class JpanelVentas extends javax.swing.JPanel {
         consultar();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void JTVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTVentasMouseClicked
-        int fila = JTVentas.getSelectedRow();
+    private void JTInventarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTInventarioMouseClicked
+        int fila = JTInventario.getSelectedRow();
 
         if (fila == -1) {
             JOptionPane.showMessageDialog(null, "Selecciona una fila");
         } else {
-            idc = Integer.parseInt((String) JTVentas.getValueAt(fila, 0).toString());
-            String NomEmpleado = (String) JTVentas.getValueAt(fila, 1);
-            String TipoContrato = (String) JTVentas.getValueAt(fila, 2);
-            String NumDireccion = (String) JTVentas.getValueAt(fila, 3);
+            idc = Integer.parseInt((String) JTInventario.getValueAt(fila, 0).toString());
+            String NombreProducto = (String) JTInventario.getValueAt(fila, 1);
+            String Precio = (String) JTInventario.getValueAt(fila, 2);
+            String Stock = (String) JTInventario.getValueAt(fila, 3);
 
-            txtCodigoVenta.setText("" + idc);
-            txtMonto.setText(NomEmpleado);
-            txtFechaVenta.setText(TipoContrato);
-            txtDniCliente.setSelectedItem(NumDireccion);
+            txtCodigoProducto.setText("" + idc);
+            txtNombreProducto.setText(NombreProducto);
+            txtPrecio.setText(Precio);
+            txtStock.setText(Stock);
         }
-    }//GEN-LAST:event_JTVentasMouseClicked
+    }//GEN-LAST:event_JTInventarioMouseClicked
 
-    private void txtFechaVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaVentaActionPerformed
+    private void txtPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtFechaVentaActionPerformed
-
-    private void btnComprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnComprarActionPerformed
-        venderProductos abrir = new venderProductos();
-        temp.leerDatosTxtTemp(venderProductos.JTConsumos, "temp.txt");
-        abrir.setVisible(true);
-    }//GEN-LAST:event_btnComprarActionPerformed
-
+    }//GEN-LAST:event_txtPrecioActionPerformed
+    
     private void Nuevo() {
         text.limpiarTxtFields();
     }
 
     void Eliminar() {
-        int fila = JTVentas.getSelectedRow();
+        int fila = JTInventario.getSelectedRow();
         if (fila == -1) {
             JOptionPane.showMessageDialog(null, "Selecciona una fila");
         } else {
-            crud.eliminar("venta", "codigoVenta", Integer.parseInt((String) JTVentas.getValueAt(fila, 0).toString()));
+            crud.eliminar("inventario", "codigoProducto", Integer.parseInt((String) JTInventario.getValueAt(fila, 0).toString()));
         }
     }
 
     void Agregar() {
-        crud.insertar("venta", datosInsertar());
+        crud.insertar("inventario", datosInsertar());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable JTVentas;
+    private javax.swing.JTable JTInventario;
     private javax.swing.JButton btnAgregar;
-    private javax.swing.JButton btnComprar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnNuevo;
@@ -355,9 +320,10 @@ public class JpanelVentas extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JTextField txtCodigoVenta;
-    private javax.swing.JComboBox<String> txtDniCliente;
-    private javax.swing.JTextField txtFechaVenta;
-    public static javax.swing.JTextField txtMonto;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JTextField txtCodigoProducto;
+    private javax.swing.JTextField txtNombreProducto;
+    private javax.swing.JTextField txtPrecio;
+    private javax.swing.JTextField txtStock;
     // End of variables declaration//GEN-END:variables
 }

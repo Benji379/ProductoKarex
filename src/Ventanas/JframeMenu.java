@@ -1,6 +1,8 @@
 package Ventanas;
 
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import javax.swing.JPanel;
 
 public class JframeMenu extends javax.swing.JFrame {
 
@@ -8,6 +10,7 @@ public class JframeMenu extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         listaEmpresas();
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/iconoSodimac.png")));
     }
 
     @SuppressWarnings("unchecked")
@@ -18,11 +21,9 @@ public class JframeMenu extends javax.swing.JFrame {
         jMenuModulos = new javax.swing.JMenuBar();
         jMenuEmpresas = new javax.swing.JMenu();
         jMenuVentas = new javax.swing.JMenu();
-        jMenuAlmacen = new javax.swing.JMenu();
         jMenuCliente = new javax.swing.JMenu();
         jMenuEmpleado = new javax.swing.JMenu();
         jMenuInventario = new javax.swing.JMenu();
-        jMenuProducto = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -41,11 +42,6 @@ public class JframeMenu extends javax.swing.JFrame {
                 jMenuEmpresasMouseClicked(evt);
             }
         });
-        jMenuEmpresas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuEmpresasActionPerformed(evt);
-            }
-        });
         jMenuModulos.add(jMenuEmpresas);
 
         jMenuVentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/compras.png"))); // NOI18N
@@ -58,12 +54,6 @@ public class JframeMenu extends javax.swing.JFrame {
             }
         });
         jMenuModulos.add(jMenuVentas);
-
-        jMenuAlmacen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/almacen.png"))); // NOI18N
-        jMenuAlmacen.setText("ALMACEN");
-        jMenuAlmacen.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jMenuAlmacen.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
-        jMenuModulos.add(jMenuAlmacen);
 
         jMenuCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/clasificacion.png"))); // NOI18N
         jMenuCliente.setText("CLIENTE");
@@ -91,66 +81,56 @@ public class JframeMenu extends javax.swing.JFrame {
         jMenuInventario.setText("INVENTARIO");
         jMenuInventario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jMenuInventario.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
+        jMenuInventario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenuInventarioMouseClicked(evt);
+            }
+        });
         jMenuModulos.add(jMenuInventario);
-
-        jMenuProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/caja.png"))); // NOI18N
-        jMenuProducto.setText("PRODUCTO");
-        jMenuProducto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jMenuProducto.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
-        jMenuModulos.add(jMenuProducto);
 
         setJMenuBar(jMenuModulos);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuEmpresasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuEmpresasActionPerformed
-
-    }//GEN-LAST:event_jMenuEmpresasActionPerformed
-
     private void jMenuEmpresasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuEmpresasMouseClicked
         listaEmpresas();
     }//GEN-LAST:event_jMenuEmpresasMouseClicked
 
-    private void listaEmpresas() {
-        JpanelEmpresas p = new JpanelEmpresas();
-        p.setSize(1000, 570);
-        p.setLocation(0, 0);
+    private void mostrarPanel(JPanel panel) {
+        panel.setSize(1000, 570);
+        panel.setLocation(0, 0);
         contenedor.removeAll();
-        contenedor.add(p, BorderLayout.CENTER);
+        contenedor.add(panel, BorderLayout.CENTER);
         contenedor.revalidate();
         contenedor.repaint();
     }
 
+    private void listaEmpresas() {
+        JpanelEmpresas p = new JpanelEmpresas();
+        mostrarPanel(p);
+    }
+
     private void jMenuVentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuVentasMouseClicked
         JpanelVentas p = new JpanelVentas();
-        p.setSize(1000, 570);
-        p.setLocation(0, 0);
-        contenedor.removeAll();
-        contenedor.add(p, BorderLayout.CENTER);
-        contenedor.revalidate();
-        contenedor.repaint();
+        mostrarPanel(p);
     }//GEN-LAST:event_jMenuVentasMouseClicked
+
 
     private void jMenuClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuClienteMouseClicked
         JpanelClientes p = new JpanelClientes();
-        p.setSize(1000, 570);
-        p.setLocation(0, 0);
-        contenedor.removeAll();
-        contenedor.add(p, BorderLayout.CENTER);
-        contenedor.revalidate();
-        contenedor.repaint();
+        mostrarPanel(p);
     }//GEN-LAST:event_jMenuClienteMouseClicked
 
     private void jMenuEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuEmpleadoMouseClicked
         JpanelEmpleados p = new JpanelEmpleados();
-        p.setSize(1000, 570);
-        p.setLocation(0, 0);
-        contenedor.removeAll();
-        contenedor.add(p, BorderLayout.CENTER);
-        contenedor.revalidate();
-        contenedor.repaint();
+        mostrarPanel(p);
     }//GEN-LAST:event_jMenuEmpleadoMouseClicked
+
+    private void jMenuInventarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuInventarioMouseClicked
+        JpanelInventario p = new JpanelInventario();
+        mostrarPanel(p);
+    }//GEN-LAST:event_jMenuInventarioMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -181,13 +161,11 @@ public class JframeMenu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel contenedor;
-    private javax.swing.JMenu jMenuAlmacen;
     private javax.swing.JMenu jMenuCliente;
     private javax.swing.JMenu jMenuEmpleado;
     private javax.swing.JMenu jMenuEmpresas;
     private javax.swing.JMenu jMenuInventario;
     private javax.swing.JMenuBar jMenuModulos;
-    private javax.swing.JMenu jMenuProducto;
     private javax.swing.JMenu jMenuVentas;
     // End of variables declaration//GEN-END:variables
 }
