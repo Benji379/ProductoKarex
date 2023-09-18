@@ -41,7 +41,8 @@ public class Crud {
             System.out.println("ERROR: " + e.getMessage());
         }
     }
-public void modificar(String nombreTabla, String nombreID, int numeroFila, Map<String, String> columnasValores) {
+
+    public void modificar(String nombreTabla, String nombreID, int numeroFila, Map<String, String> columnasValores) {
         String query = "UPDATE " + nombreTabla + " SET ";
         int contador = 0;
 
@@ -59,7 +60,7 @@ public void modificar(String nombreTabla, String nombreID, int numeroFila, Map<S
         query += " WHERE " + nombreID + " = ?";
 
         try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             int index = 1;
             for (Map.Entry<String, String> entry : columnasValores.entrySet()) {
