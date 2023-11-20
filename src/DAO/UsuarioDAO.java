@@ -8,7 +8,6 @@ public class UsuarioDAO {
     public boolean autenticarUsuario(String tabla, String columnaEmpleado, String columnaContrasena, String usuario, String contrasena) {
         boolean ingresoValido = false;
         String query = "SELECT * FROM " + tabla + " WHERE " + columnaEmpleado + " = ?";
-        
         Connection conexion;
         PreparedStatement statement;
         
